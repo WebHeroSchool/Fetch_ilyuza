@@ -1,30 +1,35 @@
 let body = document.body;
 
-let url = window.location.toString();
+let getName = () => {
+  let url = window.location.toString();
+  let userName = url.split('=');
+  if (userName[1]) {
+    username = userName[1];
+  } else {
+    username = 'IlyuzaCode'
+  }
+  return username;
+}
 
-function checkUsername(url) {
- 	let urlSplit = url.split('=');
-	let name = urlSplit[1];
-	if (name == undefined) {
-		name = 'IlyuzaCode';
-	}
+let data = new Date().toLocaleDateString();
+let userData = document.createElement('p');
 
- 		return name;
- 
- }
+const getData = new Promise((resolve, reject) => {
+  setTimeout(() => data ? resolve(userData.innerHTML = data) : reject('Данные отсутствуют'), 2000);
+});
 
-console.log(checkUsername(url));
 
- fetch(`https://api.github.com/users/${checkUsername(url)}`)
-	.then(res => res.json())
-    .then(json => {
+Promise.all([getData])
+  .then(() => fetch(`https://api.github.com/users/${getName()}`))
+  .then(res => res.json())
+  .then(json => {
         console.log(json.avatar_url);
         console.log(json.name);
         console.log(json.bio);
         console.log(json.html_url);
 
-		let img = new Image();
-		img.src = json.avatar_url;
+    let img = new Image();
+    img.src = json.avatar_url;
         body.append(img);
 
         let name = document.createElement('p');
@@ -49,3 +54,6 @@ console.log(checkUsername(url));
     })
 
     .catch(err => document.body.innerHTML = ('Информация о пользователе недоступна'));
+
+const preloader = document.getElementById('preloader');
+setTimeout(() => preloader.classList.add('hidden'), 2000);
