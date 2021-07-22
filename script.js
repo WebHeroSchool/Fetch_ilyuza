@@ -50,6 +50,7 @@ Promise.all([getData])
             bio.innerHTML = 'Информация о bio пользователя недоступна';
         }
         body.append(bio);
+        body.append(userData);
 
     })
 
