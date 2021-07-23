@@ -1,4 +1,5 @@
 let body = document.body;
+const preloader = document.getElementById('preloader');
 
 let getName = () => {
   let url = window.location.toString();
@@ -14,15 +15,21 @@ let getName = () => {
 let data = new Date().toLocaleDateString();
 let userData = document.createElement('p');
 
+const userUrl = `https://api.github.com/users/${getName()}`;
+
 const getData = new Promise((resolve, reject) => {
   setTimeout(() => data ? resolve(userData.innerHTML = data) : reject('Данные отсутствуют'), 2000);
 });
 
+const getUrl = new Promise((resolve,reject) => {
+   setTimeout(() => userUrl ? resolve(userUrl) : reject('Данные отсутствуют'), 3000);
+})
 
-Promise.all([getData])
-  .then(() => fetch(`https://api.github.com/users/${getName()}`))
+Promise.all([getData, getUrl])
+  .then(([data, userUrl]) => fetch(userUrl))
   .then(res => res.json())
   .then(json => {
+        preloader.classList.add('hidden');
         console.log(json.avatar_url);
         console.log(json.name);
         console.log(json.bio);
@@ -41,7 +48,7 @@ Promise.all([getData])
 
         body.append(name);
 
-        name.addEventListener("click", () => location.assign(`https://github.com/${checkUsername(url)}`));
+        name.addEventListener("click", () => location.assign(`https://github.com/${getName()}`));
 
         let bio = document.createElement('p');
         if (json.bio != null) {
@@ -56,5 +63,3 @@ Promise.all([getData])
 
     .catch(err => document.body.innerHTML = ('Информация о пользователе недоступна'));
 
-const preloader = document.getElementById('preloader');
-setTimeout(() => preloader.classList.add('hidden'), 2000);
