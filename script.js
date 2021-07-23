@@ -1,30 +1,42 @@
 let body = document.body;
+const preloader = document.getElementById('preloader');
 
-let url = window.location.toString();
+let getName = () => {
+  let url = window.location.toString();
+  let userName = url.split('=');
+  if (userName[1]) {
+    username = userName[1];
+  } else {
+    username = 'IlyuzaCode'
+  }
+  return username;
+}
 
-function checkUsername(url) {
- 	let urlSplit = url.split('=');
-	let name = urlSplit[1];
-	if (name == undefined) {
-		name = 'IlyuzaCode';
-	}
+let data = new Date().toLocaleDateString();
+let userData = document.createElement('p');
 
- 		return name;
- 
- }
+const userUrl = `https://api.github.com/users/${getName()}`;
 
-console.log(checkUsername(url));
+const getData = new Promise((resolve, reject) => {
+  setTimeout(() => data ? resolve(userData.innerHTML = data) : reject('Данные отсутствуют'), 2000);
+});
 
- fetch(`https://api.github.com/users/${checkUsername(url)}`)
-	.then(res => res.json())
-    .then(json => {
+const getUrl = new Promise((resolve,reject) => {
+   setTimeout(() => userUrl ? resolve(userUrl) : reject('Данные отсутствуют'), 3000);
+})
+
+Promise.all([getData, getUrl])
+  .then(([data, userUrl]) => fetch(userUrl))
+  .then(res => res.json())
+  .then(json => {
+        preloader.classList.add('hidden');
         console.log(json.avatar_url);
         console.log(json.name);
         console.log(json.bio);
         console.log(json.html_url);
 
-		let img = new Image();
-		img.src = json.avatar_url;
+    let img = new Image();
+    img.src = json.avatar_url;
         body.append(img);
 
         let name = document.createElement('p');
@@ -36,7 +48,7 @@ console.log(checkUsername(url));
 
         body.append(name);
 
-        name.addEventListener("click", () => location.assign(`https://github.com/${checkUsername(url)}`));
+        name.addEventListener("click", () => location.assign(`https://github.com/${getName()}`));
 
         let bio = document.createElement('p');
         if (json.bio != null) {
@@ -45,7 +57,9 @@ console.log(checkUsername(url));
             bio.innerHTML = 'Информация о bio пользователя недоступна';
         }
         body.append(bio);
+        body.append(userData);
 
     })
 
     .catch(err => document.body.innerHTML = ('Информация о пользователе недоступна'));
+
